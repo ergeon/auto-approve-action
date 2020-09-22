@@ -1,0 +1,13 @@
+name: 'Auto Approve'
+description: 'Automatically approve pull requests'
+inputs:
+  github-token:
+    description: 'The GITHUB_TOKEN secret'
+    required: true
+    default: ${{ github.token }}
+  config:
+    description: 'Path to config file'
+    required: true
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
