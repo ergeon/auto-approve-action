@@ -19,6 +19,10 @@ const checkPullRequest = async (
     pullRequest
   );
 
+  if (await checkRevertPullRequest(pullRequest)) {
+    return [true, "Approved for revert pull request"];
+  }
+
   if (await checkConfigChanges(pullRequestFiles)) {
     return [false, "Auto-approve config changed"];
   }
@@ -41,6 +45,12 @@ const getPullRequestFiles = async (
   const commits = await getPullRequestCommits(client, pullRequest);
 
   return getCommitFiles(commits);
+};
+
+const checkRevertPullRequest = async (
+  pullRequest: PullRequest
+): Promise<boolean> => {
+  return pullRequest.title && pullRequest.title.startsWith("Revert");
 };
 
 const checkConfigChanges = async (
