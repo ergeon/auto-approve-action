@@ -1532,6 +1532,9 @@ const utils_1 = __webpack_require__(163);
 const settings_1 = __webpack_require__(25);
 const checkPullRequest = (client, pullRequest) => __awaiter(void 0, void 0, void 0, function* () {
     const pullRequestFiles = yield getPullRequestFiles(client, pullRequest);
+    if (yield checkRevertPullRequest(pullRequest)) {
+        return [true, "Approved for revert pull request"];
+    }
     if (yield checkConfigChanges(pullRequestFiles)) {
         return [false, "Auto-approve config changed"];
     }
@@ -1546,6 +1549,9 @@ const checkPullRequest = (client, pullRequest) => __awaiter(void 0, void 0, void
 const getPullRequestFiles = (client, pullRequest) => __awaiter(void 0, void 0, void 0, function* () {
     const commits = yield github_1.getPullRequestCommits(client, pullRequest);
     return utils_1.getCommitFiles(commits);
+});
+const checkRevertPullRequest = (pullRequest) => __awaiter(void 0, void 0, void 0, function* () {
+    return pullRequest.title && pullRequest.title.startsWith("Revert");
 });
 const checkConfigChanges = (pullRequestFiles) => __awaiter(void 0, void 0, void 0, function* () {
     return (pullRequestFiles.modified.has(settings_1.settings["config-path"]) ||
