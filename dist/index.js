@@ -1585,13 +1585,28 @@ const checkAllowedFiles = (pullRequestFiles) => __awaiter(void 0, void 0, void 0
         }
     }
     const allAllowedFiles = settings_1.settings["allowed-files"] || [];
+    const allAllowedFilesSets = new Array();
+    const allowedFilesSetMap = new Map();
     for (const allowedFiles of allAllowedFiles) {
-        const allowedFilesSet = new Set(allowedFiles);
-        if (utils_1.compareSets(allowedFilesSet, pullRequestFiles.modified)) {
-            return true;
+        const allowedFilesSet = new utils_1.MutableSet(allowedFiles);
+        allAllowedFilesSets.push(allowedFilesSet);
+        for (const allowedFile of allowedFiles) {
+            allowedFilesSetMap.set(allowedFile, allowedFilesSet);
         }
     }
-    return false;
+    for (const modifiedFile of pullRequestFiles.modified) {
+        const allowedFilesSet = allowedFilesSetMap.get(modifiedFile);
+        if (allowedFilesSet === undefined) {
+            return false;
+        }
+        allowedFilesSet.delete(modifiedFile);
+    }
+    for (const allowedFilesSet of allAllowedFilesSets) {
+        if (!allowedFilesSet.isEmpty() && allowedFilesSet.hasChanged()) {
+            return false;
+        }
+    }
+    return true;
 });
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     yield settings_1.configure();
@@ -2069,7 +2084,7 @@ function paginatePlugin(octokit) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.compareSets = exports.getCommitFiles = void 0;
+exports.MutableSet = exports.compareSets = exports.getCommitFiles = void 0;
 const FILE_PROCESSORS = {
     added: (file, allFiles) => {
         allFiles.added.add(file.filename);
@@ -2138,6 +2153,23 @@ exports.compareSets = (set1, set2) => {
     }
     return true;
 };
+class MutableSet extends Set {
+    constructor(objects) {
+        super(objects);
+        this._hasChanged = false;
+    }
+    delete(value) {
+        this._hasChanged = true;
+        return super.delete(value);
+    }
+    hasChanged() {
+        return this._hasChanged;
+    }
+    isEmpty() {
+        return this.size == 0;
+    }
+}
+exports.MutableSet = MutableSet;
 
 
 /***/ }),
