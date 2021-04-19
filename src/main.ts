@@ -7,7 +7,7 @@ import {
   getPullRequest,
   getPullRequestCommits
 } from "./github";
-import { CommitFiles, compareSets, getCommitFiles } from "./utils";
+import { CommitFiles, getCommitFiles, MutableSet } from "./utils";
 import { configure, settings } from "./settings";
 
 const checkPullRequest = async (
@@ -98,16 +98,36 @@ const checkAllowedFiles = async (
   }
 
   const allAllowedFiles = settings["allowed-files"] || [];
+  const allAllowedFilesSets = new Array<MutableSet<string>>();
+  const allowedFilesSetMap = new Map<string, MutableSet<string>>();
 
   for (const allowedFiles of allAllowedFiles) {
-    const allowedFilesSet = new Set<string>(allowedFiles);
+    const allowedFilesSet = new MutableSet<string>(allowedFiles);
 
-    if (compareSets(allowedFilesSet, pullRequestFiles.modified)) {
-      return true;
+    allAllowedFilesSets.push(allowedFilesSet);
+
+    for (const allowedFile of allowedFiles) {
+      allowedFilesSetMap.set(allowedFile, allowedFilesSet);
     }
   }
 
-  return false;
+  for (const modifiedFile of pullRequestFiles.modified) {
+    const allowedFilesSet = allowedFilesSetMap.get(modifiedFile);
+
+    if (allowedFilesSet === undefined) {
+      return false;
+    }
+
+    allowedFilesSet.delete(modifiedFile);
+  }
+
+  for (const allowedFilesSet of allAllowedFilesSets) {
+    if (!allowedFilesSet.isEmpty() && allowedFilesSet.hasChanged()) {
+      return false;
+    }
+  }
+
+  return true;
 };
 
 const run = async (): Promise<void> => {

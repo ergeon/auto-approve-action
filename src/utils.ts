@@ -95,3 +95,25 @@ export const compareSets = (set1: Set<string>, set2: Set<string>): boolean => {
 
   return true;
 };
+
+export class MutableSet<T> extends Set<T> {
+  protected _hasChanged: boolean;
+
+  constructor(objects: Array<T>) {
+    super(objects);
+    this._hasChanged = false;
+  }
+
+  delete(value: T): boolean {
+    this._hasChanged = true;
+    return super.delete(value);
+  }
+
+  hasChanged(): boolean {
+    return this._hasChanged;
+  }
+
+  isEmpty(): boolean {
+    return this.size == 0;
+  }
+}
