@@ -1,7 +1,20 @@
 version: 2
-
+registries:
+  npm-registry-npm-ergeon-in:
+    type: npm-registry
+    url: https://npm.ergeon.in
+    token: '${{secrets.NPM_REGISTRY_NPM_ERGEON_IN_TOKEN}}'
 updates:
-  - package-ecosystem: "javascript"
+  - package-ecosystem: npm
     directory: "/"
     schedule:
       interval: "daily"
+    open-pull-requests-limit: 10
+    reviewers:
+      - ergeon/eng-enterprise-team
+    allow:
+      - dependency-name: '@ergeon/*'
+    registries:
+      - npm-registry-npm-ergeon-in
+    commit-message:
+      prefix: '[SKIP COV] '
