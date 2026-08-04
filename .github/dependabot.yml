@@ -6,6 +6,9 @@ registries:
     token: '${{secrets.NPM_REGISTRY_NPM_ERGEON_IN_TOKEN}}'
 updates:
   - package-ecosystem: npm
+    cooldown:
+      exclude:
+        - '@ergeon/*'
     directory: "/"
     schedule:
       interval: "daily"
