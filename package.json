@@ -16,7 +16,7 @@
   "license": "MIT",
   "homepage": "https://github.com/Abildin/auto-approve-action",
   "dependencies": {
-    "@actions/core": "~1.2",
+    "@actions/core": "~1.9",
     "@actions/github": "~2.2"
   },
   "devDependencies": {
