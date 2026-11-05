@@ -6,6 +6,16 @@ registries:
     token: '${{secrets.NPM_REGISTRY_NPM_ERGEON_IN_TOKEN}}'
 updates:
   - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 0
+    registries:
+      - npm-registry-npm-ergeon-in
+    commit-message:
+      prefix: '[SKIP COV] '
+  - package-ecosystem: npm
+    target-branch: master
     cooldown:
       exclude:
         - '@ergeon/*'
